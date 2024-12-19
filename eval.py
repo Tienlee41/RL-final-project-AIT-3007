@@ -1,8 +1,10 @@
 from magent2.environments import battle_v4
 from torch_model import QNetwork
 from final_torch_model import QNetwork as FinalQNetwork
+from dqn_model import DQN
 import torch
 import numpy as np
+import random
 
 try:
     from tqdm import tqdm
@@ -17,12 +19,20 @@ def eval():
 
     def random_policy(env, agent, obs):
         return env.action_space(agent).sample()
+    
+    q_network_blue = DQN(
+        env.observation_space("red_0").shape, env.action_space("red_0").n
+    ).to("cpu")
+    q_network_blue.load_state_dict(
+        torch.load("models1/blue_0.pt", weights_only=True, map_location="cpu")["policy_net_state_dict"]
+    )
+    q_network_blue.to(device)
 
     q_network = QNetwork(
         env.observation_space("red_0").shape, env.action_space("red_0").n
     )
     q_network.load_state_dict(
-        torch.load("red.pt", weights_only=True, map_location="cpu")
+        torch.load("red.pt", weights_only=True, map_location=device)
     )
     q_network.to(device)
 
@@ -30,7 +40,7 @@ def eval():
         env.observation_space("red_0").shape, env.action_space("red_0").n
     )
     final_q_network.load_state_dict(
-        torch.load("red_final.pt", weights_only=True, map_location="cpu")
+        torch.load("red_final.pt", weights_only=True, map_location=device)
     )
     final_q_network.to(device)
 
@@ -49,6 +59,17 @@ def eval():
         with torch.no_grad():
             q_values = final_q_network(observation)
         return torch.argmax(q_values, dim=1).cpu().numpy()[0]
+    
+    def blue_policy(env,observation):
+        sample = random.random()
+        if sample < 0.1:
+            return env.action_space("red_0").sample()
+        else:
+            observation = torch.Tensor(observation).to(device)
+            with torch.no_grad():
+                q_values = q_network_blue(observation)
+            return torch.argmax(q_values, dim=1).cpu().numpy()[0]
+    
 
     def run_eval(env, red_policy, blue_policy, n_episode: int = 100):
         red_win, blue_win = [], []
@@ -78,7 +99,7 @@ def eval():
                     if agent_team == "red":
                         action = red_policy(env, agent, observation)
                     else:
-                        action = blue_policy(env, agent, observation)
+                        action = blue_policy(env, observation)
 
                 env.step(action)
 
@@ -101,7 +122,7 @@ def eval():
     print("Eval with random policy")
     print(
         run_eval(
-            env=env, red_policy=random_policy, blue_policy=random_policy, n_episode=30
+            env=env, red_policy=random_policy, blue_policy=blue_policy, n_episode=30
         )
     )
     print("=" * 20)
@@ -109,7 +130,7 @@ def eval():
     print("Eval with trained policy")
     print(
         run_eval(
-            env=env, red_policy=pretrain_policy, blue_policy=random_policy, n_episode=30
+            env=env, red_policy=pretrain_policy, blue_policy=blue_policy, n_episode=30
         )
     )
     print("=" * 20)
@@ -119,7 +140,7 @@ def eval():
         run_eval(
             env=env,
             red_policy=final_pretrain_policy,
-            blue_policy=random_policy,
+            blue_policy=blue_policy,
             n_episode=30,
         )
     )
