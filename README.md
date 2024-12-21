@@ -29,9 +29,9 @@ In the above demo, the left side shows the blue agent competing against random r
 
 ## Evaluation of model
 
-<p align="center">
-  <img src="assets/eval.gif" width="300" alt="Evaluation" />
-</p>
+Run the file eval.ipynb to check the evolution results.
+
+![alt text](assets/eval.png)
 
 ## Installation
 clone this repo and install with
