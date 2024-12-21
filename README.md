@@ -10,9 +10,18 @@ Your agent's performance should be evaluated based on reward and win rate agains
 
 ## Our models
 
+### Random policies
 <p align="center">
   <img src="assets/random.gif" width="300" alt="random agent" />
+</p>
+
+### Pretrained policies
+<p align="center">
   <img src="assets/pretrained.gif" width="300" alt="pretrained agent" />
+</p>
+
+### Trained policies
+<p align="center">
   <img src="assets/trained.gif" width="300" alt="final agent" />
 </p>
 

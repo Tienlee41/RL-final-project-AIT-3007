@@ -27,7 +27,7 @@ if __name__ == "__main__":
         env.observation_space("red_0").shape, env.action_space("red_0").n
     ).to("cuda")
     q_network_blue.load_state_dict(
-        torch.load("models/blue_11.pt", weights_only=True, map_location="cpu")["policy_net_state_dict"]
+        torch.load("models/blue_17.pt", weights_only=True, map_location="cpu")["policy_net_state_dict"]
     )
 
     #random policies
