@@ -27,6 +27,12 @@ Your agent's performance should be evaluated based on reward and win rate agains
 
 In the above demo, the left side shows the blue agent competing against random red agents, while the right side displays a battle between two self-play agents. Blue agents can comfortably defeat random agents, showing their cabability toward untrained agents, but they struggle with the red ones, which are intentionally trained more, so that they can dominate blue ones. As before, you should evaluate your agents against the red agents.
 
+## Evaluation of model
+
+<p align="center">
+  <img src="assets/eval.gif" width="300" alt="Evaluation" />
+</p>
+
 ## Installation
 clone this repo and install with
 ```
