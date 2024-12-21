@@ -15,38 +15,37 @@ except ImportError:
 def eval():
     max_cycles = 300
     env = battle_v4.env(map_size=45, max_cycles=max_cycles)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
 
     def random_policy(env, agent, obs):
         return env.action_space(agent).sample()
     
     q_network_blue = DQN(
         env.observation_space("red_0").shape, env.action_space("red_0").n
-    ).to("cpu")
+    ).to("cuda")
     q_network_blue.load_state_dict(
-        torch.load("models1/blue_0.pt", weights_only=True, map_location="cpu")["policy_net_state_dict"]
+        torch.load("models/blue_11.pt", weights_only=True, map_location="cuda")["policy_net_state_dict"]
     )
-    q_network_blue.to(device)
+    q_network_blue.to("cuda")
 
     q_network = QNetwork(
         env.observation_space("red_0").shape, env.action_space("red_0").n
     )
     q_network.load_state_dict(
-        torch.load("red.pt", weights_only=True, map_location=device)
+        torch.load("red.pt", weights_only=True, map_location="cuda")
     )
-    q_network.to(device)
+    q_network.to("cuda")
 
     final_q_network = FinalQNetwork(
         env.observation_space("red_0").shape, env.action_space("red_0").n
     )
     final_q_network.load_state_dict(
-        torch.load("red_final.pt", weights_only=True, map_location=device)
+        torch.load("red_final.pt", weights_only=True, map_location="cuda")
     )
-    final_q_network.to(device)
+    final_q_network.to("cuda")
 
     def pretrain_policy(env, agent, obs):
         observation = (
-            torch.Tensor(obs).float().permute([2, 0, 1]).unsqueeze(0).to(device)
+            torch.Tensor(obs).float().permute([2, 0, 1]).unsqueeze(0).to("cuda")
         )
         with torch.no_grad():
             q_values = q_network(observation)
@@ -54,7 +53,7 @@ def eval():
 
     def final_pretrain_policy(env, agent, obs):
         observation = (
-            torch.Tensor(obs).float().permute([2, 0, 1]).unsqueeze(0).to(device)
+            torch.Tensor(obs).float().permute([2, 0, 1]).unsqueeze(0).to("cuda")
         )
         with torch.no_grad():
             q_values = final_q_network(observation)
@@ -65,7 +64,7 @@ def eval():
         if sample < 0.1:
             return env.action_space("red_0").sample()
         else:
-            observation = torch.Tensor(observation).to(device)
+            observation = torch.Tensor(observation).to("cuda")
             with torch.no_grad():
                 q_values = q_network_blue(observation)
             return torch.argmax(q_values, dim=1).cpu().numpy()[0]
