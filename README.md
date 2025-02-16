@@ -8,7 +8,7 @@ In this final project, you will develop and train a reinforcement learning (RL) 
 
 Your agent's performance should be evaluated based on reward and win rate against each of these models. You should control *blue* agents when evaluating.
 
-## Our models
+## Models
 
 ### Random policies
 <p align="center">
